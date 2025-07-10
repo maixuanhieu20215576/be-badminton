@@ -16,7 +16,7 @@ func main() {
 	}
 
 	// Define the routes and start the server
-	http.HandleFunc("/users", handler.GetUsers)
+	http.HandleFunc("/users/create-user", handler.CreateUser)
 	fmt.Println("Starting server on :8080...")
 
 	// Start the HTTP server

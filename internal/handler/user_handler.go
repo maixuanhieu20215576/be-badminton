@@ -2,18 +2,26 @@ package handler
 
 import (
 	"encoding/json"
-	"net/http"
 	"go-sql-project/internal/service"
+	"net/http"
+	"go-sql-project/internal/model"
 )
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := service.GetUsersFromDB()
+
+func CreateUser(w http.ResponseWriter, r *http.Request) {
+	var user model.User
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		http.Error(w, "Could not fetch users", http.StatusInternalServerError)
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
-	// Chuyển dữ liệu người dùng thành JSON
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	err = service.CreateUserInDB(&user)
+	if err != nil {
+		http.Error(w, "Could not create user", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(user)
 }

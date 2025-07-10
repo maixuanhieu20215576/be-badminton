@@ -1,16 +1,16 @@
 package service
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-var DB *sql.DB
+var DB *gorm.DB
 
 func InitDB() error {
 	err := godotenv.Load()
@@ -26,16 +26,25 @@ func InitDB() error {
 	dbSSLMode := os.Getenv("DB_SSLMODE")
 	dbChannelBinding := os.Getenv("DB_CHANNELBINDING")
 
-	connStr := fmt.Sprintf("postgresql://%s:%s@%s/%s?sslmode=%s&channel_binding=%s", 
-		dbUser, dbPassword, dbHost, dbName, dbSSLMode, dbChannelBinding)
+	connStr := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=%s channel_binding=%s",
+		dbHost, dbUser, dbPassword, dbName, dbSSLMode, dbChannelBinding)
 
-	DB, err = sql.Open("postgres", connStr)
+	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Error opening database: ", err)
 		return err
 	}
 
-	err = DB.Ping()
+	DB = db
+
+	sqlDB, err := DB.DB()
+	if err != nil {
+		log.Fatal("Error getting raw DB: ", err)
+		return err
+	}
+
+	// Ping the database
+	err = sqlDB.Ping()
 	if err != nil {
 		log.Fatal("Error pinging database: ", err)
 		return err
@@ -44,18 +53,6 @@ func InitDB() error {
 	return nil
 }
 
-func GetDB() *sql.DB {
+func GetDB() *gorm.DB {
 	return DB
-}
-
-func QueryDB(query string) (*sql.Rows, error) {
-	db := GetDB()
-
-	rows, err := db.Query(query)
-	if err != nil {
-		log.Fatal("Error executing query: ", err)
-		return nil, err
-	}
-
-	return rows, nil
 }

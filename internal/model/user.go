@@ -1,9 +1,11 @@
-// internal/model/user.go
-
 package model
 
-// User là mô hình dữ liệu cho người dùng trong cơ sở dữ liệu
+// User model đại diện cho bảng users trong cơ sở dữ liệu
 type User struct {
-	ID   int    `json:"id"`   // ID của người dùng
-	Name string `json:"name"` // Tên người dùng
+	ID                int    `json:"id" gorm:"primaryKey;autoIncrement"`
+	Username          string `json:"username" gorm:"not null"`
+	Avatar            string `json:"avatar"`
+	ReferenceUserID   int    `json:"reference_user_id"`
+	Status            string `json:"status" gorm:"default:'Playing'"`
 }
+
