@@ -21,14 +21,21 @@ func CreateUserInDB(user *model.User) error {
 	return nil // Trả về nil khi không có lỗi
 }
 
-func FindUserByID(userID int) (*model.User, error) {
+func FindUserByID(userID int) (*model.User, *model.User, error) {
 	var user model.User
+	var referenceUser model.User
 	if err := DB.First(&user, userID).Error; err != nil {
 		log.Printf("Error finding user with ID %d: %v\n", userID, err)
-		return nil, fmt.Errorf("error finding user with ID %d: %v", userID, err)
+		return nil, nil, fmt.Errorf("error finding user with ID %d: %v", userID, err)
 	}
 
-	return &user, nil
+	if user.ReferenceUserID == 0 {
+		return &user, nil, nil
+	}
+
+	DB.First(&referenceUser, user.ReferenceUserID)
+
+	return &user, &referenceUser, nil
 }
 
 func GetAllUsers() ([]*model.User, error) {
@@ -41,4 +48,15 @@ func GetAllUsers() ([]*model.User, error) {
 		userPtrs[i] = &users[i]
 	}
 	return userPtrs, nil
+}
+
+func EditUser(user *model.User) (*model.User, error) {
+	updatedUser := *user
+	updatedUser.ID = 0
+
+	if err := DB.Model(&model.User{}).Where("id = ?", user.ID).Updates(updatedUser).Error; err != nil {
+		return nil, fmt.Errorf("error editing user: %v", err)
+	}
+
+	return user, nil
 }

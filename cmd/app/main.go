@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"net/http"
 	"go-sql-project/internal/handler"
 	"go-sql-project/internal/service"
+	"log"
+	"net/http"
 )
 
 func main() {
@@ -19,6 +19,8 @@ func main() {
 	http.HandleFunc("/users/create-user", handler.CreateUser)
 	http.HandleFunc("/users/get-user-by-id", handler.GetUserById)
 	http.HandleFunc("/users/get-all-users", handler.GetAllUsers)
+	http.HandleFunc("/users/edit-user", handler.EditUser)
+
 	fmt.Println("Starting server on :8080...")
 
 	// Start the HTTP server

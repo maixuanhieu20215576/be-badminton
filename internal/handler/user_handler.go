@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"go-sql-project/internal/model"
 	"go-sql-project/internal/service"
 	"net/http"
@@ -36,13 +37,17 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := service.FindUserByID(request.UserID)
+	user, referenceUser, err := service.FindUserByID(request.UserID)
 	if err != nil {
 		http.Error(w, "Could not find user", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
+	response := map[string]interface{}{
+		"user":          user,
+		"referenceUser": referenceUser,
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
@@ -54,4 +59,19 @@ func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(users)
+}
+
+func EditUser(w http.ResponseWriter, r *http.Request) {
+	
+	var user model.User
+	json.NewDecoder(r.Body).Decode(&user)
+
+	updatedUser, err := service.EditUser(&user)
+	fmt.Print("updatedUser", err)
+	if err != nil {
+		http.Error(w, "Could not edit user", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(updatedUser)
 }
