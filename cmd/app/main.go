@@ -15,11 +15,18 @@ func main() {
 		log.Fatalf("Could not connect to the database: %v", err)
 	}
 
-	// Define the routes and start the server
+	// user route
 	http.HandleFunc("/users/create-user", handler.CreateUser)
 	http.HandleFunc("/users/get-user-by-id", handler.GetUserById)
 	http.HandleFunc("/users/get-all-users", handler.GetAllUsers)
 	http.HandleFunc("/users/edit-user", handler.EditUser)
+
+	// fund-contribution route
+	http.HandleFunc("/fund-contribution/get-contribution-fund-detail", handler.GetContributionFundDetail)
+	http.HandleFunc("/fund-contribution/add-contribution-fund", handler.AddContributionFund)
+	
+	//schedule route
+	http.HandleFunc("/schedule/create-schedule", handler.CreateSchedule)
 
 	fmt.Println("Starting server on :8080...")
 

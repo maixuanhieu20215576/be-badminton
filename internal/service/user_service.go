@@ -4,21 +4,22 @@ import (
 	"fmt"
 	"go-sql-project/internal/model"
 	"log"
+	"time"
 )
 
 func CreateUserInDB(user *model.User) error {
-	if DB == nil {
-		log.Println("Database connection is nil")
-		return fmt.Errorf("database connection is not initialized")
-	}
-
 	if err := DB.Create(user).Error; err != nil {
 		log.Printf("Error inserting user: %v\n", err)
 		return fmt.Errorf("error inserting user: %v", err)
 	}
 
-	log.Printf("Inserted user: %+v\n", user)
-	return nil // Trả về nil khi không có lỗi
+	newContributionFundRecord := model.FundContributionReport{
+		UserId:    user.ID,
+		Amount:    0,
+		CreatedAt: time.Now().Format("2005-01-02 15:04:05"),
+	}
+	DB.Create(&newContributionFundRecord)
+	return nil
 }
 
 func FindUserByID(userID int) (*model.User, *model.User, error) {
