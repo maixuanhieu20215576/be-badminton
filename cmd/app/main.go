@@ -27,6 +27,8 @@ func main() {
 	
 	//schedule route
 	http.HandleFunc("/schedule/create-schedule", handler.CreateSchedule)
+	http.HandleFunc("/schedule/edit-schedule", handler.EditSchedule)
+
 
 	fmt.Println("Starting server on :8080...")
 

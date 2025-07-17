@@ -12,3 +12,15 @@ func CreateSchedule(schedule *model.Schedule) (*model.Schedule, error) {
 
 	return schedule, nil
 }
+
+func EditSchedule(schedule *model.Schedule) (*model.Schedule, error) {
+	var currentSchedule model.Schedule
+	if err := DB.Where("id = ?", schedule.ID).First(&currentSchedule).Error; err != nil {
+		return schedule, err
+	}
+
+	if err := DB.Model(&currentSchedule).Updates(schedule).Error; err != nil {
+		return schedule, err
+	}
+	return schedule, nil
+}

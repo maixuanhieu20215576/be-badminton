@@ -23,3 +23,20 @@ func CreateSchedule(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(createdSchedule)
 }
+
+func EditSchedule(w http.ResponseWriter, r *http.Request) {
+	var schedule model.Schedule
+	if err := json.NewDecoder(r.Body).Decode(&schedule); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	editedSchedule, err := service.EditSchedule(&schedule)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(editedSchedule)
+}
